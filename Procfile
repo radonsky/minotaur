@@ -1,1 +1,1 @@
-web: java -Ddw.server.applicationConnectors[0].port=$PORT -jar target/minotaur.jar server config.yml
+web: java $JAVA_OPTS -Ddw.server.applicationConnectors[0].port=$PORT -jar target/minotaur.jar server config.yml
