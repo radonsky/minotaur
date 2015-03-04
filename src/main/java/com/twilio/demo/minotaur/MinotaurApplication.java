@@ -1,5 +1,6 @@
 package com.twilio.demo.minotaur;
 
+import com.twilio.demo.minotaur.resources.SmsResource;
 import com.twilio.demo.minotaur.resources.StatusResource;
 
 import io.dropwizard.Application;
@@ -25,9 +26,11 @@ public class MinotaurApplication extends Application<MinotaurConfiguration> {
 
     @Override
     public void run(final MinotaurConfiguration configuration, final Environment environment) throws Exception {
-        final StatusResource statusResource = new StatusResource();
         environment.healthChecks().register("healthCheck", new MinotaurHealthCheck());
+        final StatusResource statusResource = new StatusResource();
         environment.jersey().register(statusResource);
+        final SmsResource smsResource = new SmsResource();
+        environment.jersey().register(smsResource);
     }
 
 }
