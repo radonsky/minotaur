@@ -11,16 +11,16 @@ public class MazeRegistry {
         this.mazeConfig = mazeConfig;
     }
 
-    public Maze get(final String user) {
-        return this.registry.get(user);
+    public Maze get(final String phone) {
+        return this.registry.get(phone);
     }
 
-    public Maze start(final String user) {
-        return this.registry.compute(user, (final String u, final Maze m) -> new Maze(this.mazeConfig));
+    public Maze start(final String phone) {
+        return this.registry.compute(phone, (final String u, final Maze m) -> new Maze(this.mazeConfig));
     }
 
-    public boolean remove(final String user) {
-        return this.registry.remove(user) != null;
+    public boolean remove(final String phone) {
+        return this.registry.remove(phone) != null;
     }
 
     public int getCount() {

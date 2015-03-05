@@ -2,6 +2,7 @@ package com.twilio.demo.minotaur;
 
 import com.twilio.demo.minotaur.core.MazeConfig;
 import com.twilio.demo.minotaur.core.MazeRegistry;
+import com.twilio.demo.minotaur.core.UserRegistry;
 import com.twilio.demo.minotaur.resources.SmsResource;
 import com.twilio.demo.minotaur.resources.StatusResource;
 
@@ -27,11 +28,12 @@ public class MinotaurApplication extends Application<MinotaurConfiguration> {
 
     @Override
     public void run(final MinotaurConfiguration configuration, final Environment environment) throws Exception {
+        final UserRegistry userRegistry = new UserRegistry();
         final MazeRegistry mazeRegistry = new MazeRegistry(new MazeConfig());
         environment.healthChecks().register("healthCheck", new MinotaurHealthCheck());
-        final StatusResource statusResource = new StatusResource(mazeRegistry);
+        final StatusResource statusResource = new StatusResource(userRegistry, mazeRegistry);
         environment.jersey().register(statusResource);
-        final SmsResource smsResource = new SmsResource(mazeRegistry);
+        final SmsResource smsResource = new SmsResource(userRegistry, mazeRegistry);
         environment.jersey().register(smsResource);
     }
 
