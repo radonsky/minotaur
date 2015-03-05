@@ -60,6 +60,7 @@ public class SmsResource {
         switch (command.trim().toUpperCase()) {
         case "START":
             maze = this.mazeRegistry.start(phone);
+            break;
         case "W":
             valid = maze.move(Direction.WEST);
             break;
