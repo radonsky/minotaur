@@ -21,6 +21,11 @@
 			<artifactId>twilio-java-sdk</artifactId>
 			<version>3.7.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.oxo42</groupId>
+			<artifactId>stateless4j</artifactId>
+			<version>2.5.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>${project.artifactId}</finalName>
@@ -29,8 +34,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>

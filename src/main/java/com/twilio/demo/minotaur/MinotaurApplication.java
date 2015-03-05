@@ -1,5 +1,7 @@
 package com.twilio.demo.minotaur;
 
+import com.twilio.demo.minotaur.core.MazeConfig;
+import com.twilio.demo.minotaur.core.MazeRegistry;
 import com.twilio.demo.minotaur.resources.SmsResource;
 import com.twilio.demo.minotaur.resources.StatusResource;
 
@@ -20,16 +22,16 @@ public class MinotaurApplication extends Application<MinotaurConfiguration> {
 
     @Override
     public void initialize(final Bootstrap<MinotaurConfiguration> bootstrap) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void run(final MinotaurConfiguration configuration, final Environment environment) throws Exception {
+        final MazeRegistry mazeRegistry = new MazeRegistry(new MazeConfig());
         environment.healthChecks().register("healthCheck", new MinotaurHealthCheck());
-        final StatusResource statusResource = new StatusResource();
+        final StatusResource statusResource = new StatusResource(mazeRegistry);
         environment.jersey().register(statusResource);
-        final SmsResource smsResource = new SmsResource();
+        final SmsResource smsResource = new SmsResource(mazeRegistry);
         environment.jersey().register(smsResource);
     }
 
