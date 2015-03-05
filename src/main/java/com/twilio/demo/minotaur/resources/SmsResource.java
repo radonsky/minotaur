@@ -54,10 +54,12 @@ public class SmsResource {
     }
 
     private String createMessageFrom(final String phone, final String command) {
-        final Maze maze = this.mazeRegistry.get(phone);
+        Maze maze = this.mazeRegistry.get(phone);
         final StringBuilder bldr = new StringBuilder();
         boolean valid = true;
         switch (command.trim().toUpperCase()) {
+        case "START":
+            maze = this.mazeRegistry.start(phone);
         case "W":
             valid = maze.move(Direction.WEST);
             break;
@@ -77,7 +79,7 @@ public class SmsResource {
             bldr.append("I'm sorry, you can't go there! ");
         }
         if (maze.isInExitState()) {
-            bldr.append("Congratulations, you found your way out! Type START to start over.");
+            bldr.append("Congratulations, you found your way out! Type Start to start over.");
         } else {
             bldr.append(getDirections(maze.getPermittedDirections()));
         }
