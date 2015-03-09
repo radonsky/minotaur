@@ -21,6 +21,8 @@ You have to deploy this service online for it to be available to Twilio servers.
 
 Once you have the service up and running, you have to log-in to your [Twilio account](https://www.twilio.com/user/account/phone-numbers/incoming) and configure one of your phone numbers to use the deployed service as the Messaging Request URL. This service exposes a `/sms` endpoint, so say you deployed your service as `http://mygreatservice.heroku.com/`, you just put `http://mygreatservice.heroku.com/sms` in your Twilio number's Messaging configuration.
 
+**Note:** If you're using Twilio's free trial account, you have to verify phone numbers that will be able to receive SMS messages. You can follow this [link](https://www.twilio.com/user/account/phone-numbers/verified) to verify phone numbers. Please see this [FAQ page](https://www.twilio.com/help/faq/twilio-basics/how-does-twilios-free-trial-work) to learn about other limitations of Twilio's free trial account.
+
 ###Contact
 If you have any questions, please send me an email to my name at gmail.com.
 
