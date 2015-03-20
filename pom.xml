@@ -17,6 +17,11 @@
 			<version>${dropwizard.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>io.dropwizard</groupId>
+			<artifactId>dropwizard-assets</artifactId>
+			<version>${dropwizard.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.twilio.sdk</groupId>
 			<artifactId>twilio-java-sdk</artifactId>
 			<version>3.7.1</version>

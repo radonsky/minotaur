@@ -1,14 +1,16 @@
 package com.twilio.demo.minotaur;
 
+import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
+
 import com.twilio.demo.minotaur.core.MazeConfig;
 import com.twilio.demo.minotaur.core.MazeRegistry;
 import com.twilio.demo.minotaur.core.UserRegistry;
 import com.twilio.demo.minotaur.resources.SmsResource;
 import com.twilio.demo.minotaur.resources.StatusResource;
-
-import io.dropwizard.Application;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.setup.Environment;
+import com.twilio.demo.minotaur.resources.VoiceResource;
 
 public class MinotaurApplication extends Application<MinotaurConfiguration> {
 
@@ -23,7 +25,7 @@ public class MinotaurApplication extends Application<MinotaurConfiguration> {
 
     @Override
     public void initialize(final Bootstrap<MinotaurConfiguration> bootstrap) {
-
+        bootstrap.addBundle(new AssetsBundle("/assets/", "/assets"));
     }
 
     @Override
@@ -35,6 +37,8 @@ public class MinotaurApplication extends Application<MinotaurConfiguration> {
         environment.jersey().register(statusResource);
         final SmsResource smsResource = new SmsResource(userRegistry, mazeRegistry);
         environment.jersey().register(smsResource);
+        final VoiceResource voiceResource = new VoiceResource();
+        environment.jersey().register(voiceResource);
     }
 
 }
