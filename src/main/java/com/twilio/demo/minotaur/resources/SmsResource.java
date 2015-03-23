@@ -1,7 +1,5 @@
 package com.twilio.demo.minotaur.resources;
 
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -42,7 +40,7 @@ public class SmsResource {
                 try {
                     this.userRegistry.addUser(from, body);
                     final Maze maze = this.mazeRegistry.start(from);
-                    return smsReply("Hello " + body + "! Welcome to the Labyrinth. Type N, S, E, W to move around this maze and find your way out. " + getDirections(maze.getPermittedDirections()));
+                    return smsReply("Hello " + body + "! Welcome to the Labyrinth. Type N, S, E, W to move around this maze and find your way out. " + maze.getDirections());
                 } catch (final IllegalArgumentException e) {
                     return smsReply("I'm sorry but user " + body + " has been already registered. Please choose a different name.");
                 }
@@ -82,23 +80,8 @@ public class SmsResource {
         if (maze.isInExitState()) {
             bldr.append("Congratulations, you found your way out! Type Start to start over.");
         } else {
-            bldr.append(getDirections(maze.getPermittedDirections()));
+            bldr.append(maze.getDirections());
         }
-        return bldr.toString();
-    }
-
-    private String getDirections(final List<Direction> list) {
-        final StringBuilder bldr = new StringBuilder("You can go to the ");
-        bldr.append(list.get(0));
-        for (int i = 1; i < list.size() - 1; i++) {
-            bldr.append(", ");
-            bldr.append(list.get(i));
-        }
-        if (list.size() > 1) {
-            bldr.append(" and ");
-            bldr.append(list.get(list.size() - 1));
-        }
-        bldr.append(".");
         return bldr.toString();
     }
 
