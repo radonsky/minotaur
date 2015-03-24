@@ -21,14 +21,34 @@ import com.github.oxo42.stateless4j.StateMachineConfig;
 public class MazeConfig {
 
     public enum Space {
-        /*+--------------+--------------+-------------+*/
-        /*|*/ SPACE11, /* */ SPACE12, /* */ SPACE13 /*|*/,
-        /*+--------------+              +-------------+*/
-        /* */ SPACE21, /*|*/ SPACE22, /* */ SPACE23 /*|*/,
-        /*+              +--------------+             +*/
-        /*|*/ SPACE31, /* */ SPACE32, /* */ SPACE33 /*|*/,
-        /*+-------------------------------------------+*/
-        EXIT
+        //        /*+--------------+--------------+-------------+*/
+        //        /*|*/ SPACE11, /* */ SPACE12, /* */ SPACE13 /*|*/,
+        //        /*+--------------+              +-------------+*/
+        //        /* */ SPACE21, /*|*/ SPACE22, /* */ SPACE23 /*|*/,
+        //        /*+              +--------------+             +*/
+        //        /*|*/ SPACE31, /* */ SPACE32, /* */ SPACE33 /*|*/,
+        //        /*+-------------------------------------------+*/
+
+        SPACE11(""),
+        SPACE12(""),
+        SPACE13(""),
+        SPACE21(""),
+        SPACE22(""),
+        SPACE23(""),
+        SPACE31(""),
+        SPACE32(""),
+        SPACE33(""),
+        EXIT("Congratulations, you found your way out! Type Start to start over.");
+
+        private final String description;
+
+        private Space(final String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return this.description;
+        }
     }
 
     public enum Direction {

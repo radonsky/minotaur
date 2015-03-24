@@ -76,10 +76,9 @@ public class SmsResource {
         }
         if (!valid) {
             bldr.append("I'm sorry, you can't go there! ");
-        }
-        if (maze.isInExitState()) {
-            bldr.append("Congratulations, you found your way out! Type Start to start over.");
         } else {
+            bldr.append(maze.getDescription());
+            bldr.append(' ');
             bldr.append(maze.getDirections());
         }
         return bldr.toString();
