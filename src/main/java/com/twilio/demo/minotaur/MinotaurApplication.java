@@ -5,6 +5,7 @@ import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
+import com.twilio.demo.minotaur.core.Game;
 import com.twilio.demo.minotaur.core.MazeConfig;
 import com.twilio.demo.minotaur.core.MazeRegistry;
 import com.twilio.demo.minotaur.core.UserRegistry;
@@ -32,10 +33,11 @@ public class MinotaurApplication extends Application<MinotaurConfiguration> {
     public void run(final MinotaurConfiguration configuration, final Environment environment) throws Exception {
         final UserRegistry userRegistry = new UserRegistry();
         final MazeRegistry mazeRegistry = new MazeRegistry(new MazeConfig());
+        final Game game = new Game(userRegistry, mazeRegistry);
         environment.healthChecks().register("healthCheck", new MinotaurHealthCheck());
         final StatusResource statusResource = new StatusResource(userRegistry, mazeRegistry);
         environment.jersey().register(statusResource);
-        final SmsResource smsResource = new SmsResource(userRegistry, mazeRegistry);
+        final SmsResource smsResource = new SmsResource(game);
         environment.jersey().register(smsResource);
         final VoiceResource voiceResource = new VoiceResource();
         environment.jersey().register(voiceResource);
