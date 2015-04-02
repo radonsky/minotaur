@@ -8,9 +8,11 @@ import com.twilio.demo.minotaur.core.MazeConfig.Space;
 
 public class Maze {
 
+    private final MazeConfig mazeConfig;
     private final StateMachine<Space, Direction> stateMachine;
 
     public Maze(final MazeConfig mazeConfig) {
+        this.mazeConfig = mazeConfig;
         this.stateMachine = new StateMachine<>(Space.SPACE11, mazeConfig.getConfig());
     }
 
@@ -46,8 +48,12 @@ public class Maze {
         }
     }
 
-    public boolean isInExitState() {
-        return this.stateMachine.isInState(Space.EXIT);
+    public boolean isInState(final Space space) {
+        return this.stateMachine.isInState(space);
+    }
+
+    public MazeConfig getConfig() {
+        return this.mazeConfig;
     }
 
 }

@@ -9,6 +9,7 @@ import com.twilio.demo.minotaur.core.Game;
 import com.twilio.demo.minotaur.core.MazeConfig;
 import com.twilio.demo.minotaur.core.MazeRegistry;
 import com.twilio.demo.minotaur.core.UserRegistry;
+import com.twilio.demo.minotaur.resources.MediaResource;
 import com.twilio.demo.minotaur.resources.SmsResource;
 import com.twilio.demo.minotaur.resources.StatusResource;
 
@@ -38,6 +39,8 @@ public class MinotaurApplication extends Application<MinotaurConfiguration> {
         environment.jersey().register(statusResource);
         final SmsResource smsResource = new SmsResource(game);
         environment.jersey().register(smsResource);
+        final MediaResource mediaResource = new MediaResource(mazeRegistry);
+        environment.jersey().register(mediaResource);
     }
 
 }

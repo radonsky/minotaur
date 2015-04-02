@@ -15,6 +15,8 @@ import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE31;
 import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE32;
 import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE33;
 
+import java.util.List;
+
 import com.github.oxo42.stateless4j.StateMachineConfig;
 
 
@@ -69,6 +71,12 @@ public class MazeConfig {
 
     private final StateMachineConfig<Space, Direction> config = new StateMachineConfig<>();
 
+    private final Space[][] field = new Space[][] {
+            new Space[] { SPACE11, SPACE12, SPACE13 },
+            new Space[] { SPACE21, SPACE22, SPACE23 },
+            new Space[] { SPACE31, SPACE32, SPACE33 }
+    };
+
     public MazeConfig() {
         this.config.configure(SPACE11)
         .permit(EAST, SPACE12);
@@ -100,6 +108,22 @@ public class MazeConfig {
 
     public StateMachineConfig<Space, Direction> getConfig() {
         return this.config;
+    }
+
+    public int getFieldSizeX() {
+        return this.field[0].length;
+    }
+
+    public int getFieldSizeY() {
+        return this.field.length;
+    }
+
+    public Space getSpaceAt(final int x, final int y) {
+        return this.field[y][x];
+    }
+
+    public List<Direction> getPermittedDirectionsFor(final Space space) {
+        return this.config.getRepresentation(space).getPermittedTriggers();
     }
 
 }
