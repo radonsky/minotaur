@@ -1,61 +1,47 @@
 package com.twilio.demo.minotaur.core;
 
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+
 import com.twilio.demo.minotaur.core.MazeConfig.Direction;
+import com.twilio.demo.minotaur.core.command.Command;
+import com.twilio.demo.minotaur.core.command.InvalidCommand;
+import com.twilio.demo.minotaur.core.command.MoveCommand;
+import com.twilio.demo.minotaur.core.command.ShowCommand;
+import com.twilio.demo.minotaur.core.command.StartCommand;
 
 public class Game {
     private final UserRegistry userRegistry;
     private final MazeRegistry mazeRegistry;
+    private final LinkedHashMap<String, Command> commands = new LinkedHashMap<String, Command>();
 
     public Game(final UserRegistry userRegistry, final MazeRegistry mazeRegistry) {
         this.userRegistry = userRegistry;
         this.mazeRegistry = mazeRegistry;
+        this.commands.put("START", new StartCommand(this.mazeRegistry));
+        this.commands.put("W", new MoveCommand(this.mazeRegistry, Direction.WEST));
+        this.commands.put("S", new MoveCommand(this.mazeRegistry, Direction.SOUTH));
+        this.commands.put("N", new MoveCommand(this.mazeRegistry, Direction.NORTH));
+        this.commands.put("E", new MoveCommand(this.mazeRegistry, Direction.EAST));
+        this.commands.put("SHOW", new ShowCommand());
     }
 
-    public String command(final String userId, final String body) {
+    public Command parseCommand(final String userId, final String body) {
         if (this.userRegistry.getUser(userId) == null) {
             try {
                 this.userRegistry.addUser(userId, body);
-                final Maze maze = this.mazeRegistry.start(userId);
-                return "Hello " + body + "! Welcome to the Labyrinth. Type N, S, E, W to move around this maze and find your way out. " + maze.getDirections();
+                return this.commands.get("START");
             } catch (final IllegalArgumentException e) {
-                return "I'm sorry but user " + body + " has been already registered. Please choose a different name.";
+                return new InvalidCommand("I'm sorry but user " + body + " has been already registered. Please choose a different name.");
             }
-        }
-        return createMessageFrom(userId, body);
-    }
-
-    private String createMessageFrom(final String phone, final String command) {
-        Maze maze = this.mazeRegistry.get(phone);
-        final StringBuilder bldr = new StringBuilder();
-        boolean valid = true;
-        switch (command.trim().toUpperCase()) {
-        case "START":
-            maze = this.mazeRegistry.start(phone);
-            break;
-        case "W":
-            valid = maze.move(Direction.WEST);
-            break;
-        case "S":
-            valid = maze.move(Direction.SOUTH);
-            break;
-        case "N":
-            valid = maze.move(Direction.NORTH);
-            break;
-        case "E":
-            valid = maze.move(Direction.EAST);
-            break;
-        default:
-            bldr.append("I'm sorry, I don't know where you want to go. Type N, S, E, W to move around this maze and find your way out.");
-        }
-        if (!valid) {
-            bldr.append("I'm sorry, you can't go there! ");
-            bldr.append(maze.getDirections());
         } else {
-            bldr.append(maze.getDescription());
-            bldr.append(' ');
-            bldr.append(maze.getDirections());
+            for (final Entry<String, Command> e : this.commands.entrySet()) {
+                if (e.getKey().equals(body.trim().toUpperCase())) {
+                    return e.getValue();
+                }
+            }
+            return new InvalidCommand("I'm sorry, I don't know this command. The valid commands are: " + this.commands.keySet());
         }
-        return bldr.toString();
     }
 
 

@@ -19,7 +19,7 @@ public class MinotaurConsole {
         println("What is your name?");
         String command = readln();
         while (command != null && !command.equalsIgnoreCase("exit")) {
-            println(game.command("User", command));
+            println(game.parseCommand("User", command).action("User").getMessage());
             command = readln();
         }
     }

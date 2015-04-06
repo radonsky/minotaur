@@ -12,6 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.twilio.demo.minotaur.core.Game;
+import com.twilio.demo.minotaur.core.command.Command;
+import com.twilio.demo.minotaur.core.command.Response;
+import com.twilio.demo.minotaur.core.command.ShowCommand;
 import com.twilio.sdk.verbs.Media;
 import com.twilio.sdk.verbs.Message;
 import com.twilio.sdk.verbs.TwiMLException;
@@ -35,10 +38,28 @@ public class SmsResource {
             @QueryParam("Body") final String body,
             @Context final UriInfo uriInfo) {
         try {
-            final String mediaUrl = uriInfo.getBaseUriBuilder().path(MediaResource.class).queryParam("From", from).build().toString();
-            return mmsReply(this.game.command(from, body), mediaUrl);
+            final Command command = this.game.parseCommand(from, body);
+            final Response response = command.action(from);
+            if (command instanceof ShowCommand) {
+                final String mediaUrl = uriInfo.getBaseUriBuilder().path(MediaResource.class).queryParam("From", from).build().toString();
+                return mmsReply(response.getMessage(), mediaUrl);
+            } else {
+                return smsReply(response.getMessage());
+            }
         } catch (final Exception e) {
             return "<Error>" + e.getMessage() + "<Error>";
+        }
+    }
+
+    private String smsReply(final String text) throws TwiMLException {
+        final TwiMLResponse twiml = new TwiMLResponse();
+        final Message message = new Message(text);
+        try {
+            twiml.append(message);
+            return twiml.toXML();
+        } catch (final TwiMLException e) {
+            log.error("Cannot create SMS", e);
+            throw e;
         }
     }
 
@@ -51,7 +72,7 @@ public class SmsResource {
             twiml.append(message);
             return twiml.toXML();
         } catch (final TwiMLException e) {
-            log.error("Cannot create SMS", e);
+            log.error("Cannot create MMS", e);
             throw e;
         }
     }
