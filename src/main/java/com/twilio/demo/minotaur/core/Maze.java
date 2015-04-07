@@ -1,8 +1,9 @@
 package com.twilio.demo.minotaur.core;
 
+import java.util.EnumSet;
 import java.util.List;
-
 import com.github.oxo42.stateless4j.StateMachine;
+import com.github.oxo42.stateless4j.transitions.Transition;
 import com.twilio.demo.minotaur.core.MazeConfig.Direction;
 import com.twilio.demo.minotaur.core.MazeConfig.Space;
 
@@ -10,10 +11,17 @@ public class Maze {
 
     private final MazeConfig mazeConfig;
     private final StateMachine<Space, Direction> stateMachine;
+    private final EnumSet<Space> visitedStates;
 
     public Maze(final MazeConfig mazeConfig) {
         this.mazeConfig = mazeConfig;
-        this.stateMachine = new StateMachine<>(Space.SPACE11, mazeConfig.getConfig());
+        final Space initialState = mazeConfig.getInitialSpace();
+        this.stateMachine = new StateMachine<>(initialState, mazeConfig.configure(this::onEntry));
+        this.visitedStates = EnumSet.of(initialState);
+    }
+
+    public void onEntry(final Transition<Space, Direction> transition) {
+        this.visitedStates.add(transition.getDestination());
     }
 
     public String getDirections() {
@@ -54,6 +62,10 @@ public class Maze {
 
     public MazeConfig getConfig() {
         return this.mazeConfig;
+    }
+
+    public boolean isVisitedState(final Space space) {
+        return this.visitedStates.contains(space);
     }
 
 }

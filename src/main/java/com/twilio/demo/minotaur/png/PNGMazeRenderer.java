@@ -5,7 +5,7 @@ import static com.twilio.demo.minotaur.core.MazeConfig.Direction.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
@@ -34,17 +34,19 @@ public class PNGMazeRenderer implements StreamingOutput {
             this.cells[y] = new Cell[maze.getConfig().getFieldSizeX()];
             for (int x = 0; x < this.cells[y].length; x++) {
                 final Space space = maze.getConfig().getSpaceAt(x, y);
-                this.cells[y][x] = new Cell(maze.getConfig().getPermittedDirectionsFor(space), maze.isInState(space));
+                this.cells[y][x] = new Cell(
+                        maze.getConfig().getPermittedDirectionsFor(space),
+                        maze.isInState(space),
+                        maze.isVisitedState(space));
             }
         }
     }
 
     private static class Cell {
 
-        private static final int SIZE = 20;
-        private static final int WALL_SIZE = 1;
-        private static final int PRESENCE_SIZE = 6;
-
+        private static final int SIZE = 40;
+        private static final int WALL_SIZE = 2;
+        private static final int PRESENCE_SIZE = 12;
 
         private static final int WALL_COLOR = 0x00;
         private static final int EMPTY_COLOR = 0xFF;
@@ -52,11 +54,13 @@ public class PNGMazeRenderer implements StreamingOutput {
 
         private final EnumSet<Direction> walls;
         private final boolean present;
+        private final boolean visited;
 
-        public Cell(final List<Direction> permittedDirections, final boolean present) {
+        public Cell(final Set<Direction> permittedDirections, final boolean present, final boolean visited) {
             this.walls = EnumSet.allOf(Direction.class);
             this.walls.removeAll(permittedDirections);
             this.present = present;
+            this.visited = visited;
         }
 
         public int getColorAt(final int x, final int y) {
@@ -72,17 +76,19 @@ public class PNGMazeRenderer implements StreamingOutput {
                     return PRESENCE_COLOR;
                 }
             }
-            if (x < WALL_SIZE && this.walls.contains(WEST)) {
-                return WALL_COLOR;
-            }
-            if (x > SIZE - WALL_SIZE - 1 && this.walls.contains(EAST)) {
-                return WALL_COLOR;
-            }
-            if (y < WALL_SIZE && this.walls.contains(NORTH)) {
-                return WALL_COLOR;
-            }
-            if (y > SIZE - WALL_SIZE - 1 && this.walls.contains(SOUTH)) {
-                return WALL_COLOR;
+            if (this.visited) {
+                if (x < WALL_SIZE && this.walls.contains(WEST)) {
+                    return WALL_COLOR;
+                }
+                if (x > SIZE - WALL_SIZE - 1 && this.walls.contains(EAST)) {
+                    return WALL_COLOR;
+                }
+                if (y < WALL_SIZE && this.walls.contains(NORTH)) {
+                    return WALL_COLOR;
+                }
+                if (y > SIZE - WALL_SIZE - 1 && this.walls.contains(SOUTH)) {
+                    return WALL_COLOR;
+                }
             }
             return EMPTY_COLOR;
         }
