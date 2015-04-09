@@ -19,6 +19,7 @@ import com.google.common.collect.SetMultimap;
 public class MazeConfig {
 
     public static final class Space {
+
         public static final Space EXIT = new Space("EXIT");
 
         private final String name;
@@ -50,32 +51,66 @@ public class MazeConfig {
         }
     }
 
-    private final Space[][] field = createField(3, 3);
+    private final Space[][] field;
 
     private static final int EXIT_X_COORD = -1;
     private static final int EXIT_Y_COORD = 1;
 
     private final SetMultimap<Space, Direction> permittedDirections;
 
-    public MazeConfig() {
-        //        /*+--------------+--------------+-------------+*/
-        //        /*|*/ SPACE11, /* */ SPACE12, /* */ SPACE13 /*|*/,
-        //        /*+--------------+              +-------------+*/
-        //        /* */ SPACE21, /*|*/ SPACE22, /* */ SPACE23 /*|*/,
-        //        /*+              +--------------+             +*/
-        //        /*|*/ SPACE31, /* */ SPACE32, /* */ SPACE33 /*|*/,
-        //        /*+-------------------------------------------+*/
+    private static final char SPACE = ' ';
 
+    private final String[] layout = new String[] {
+            "+-+-+-+-+-+",
+            "|   |     |",
+            "+-+ + + +-+",
+            "  |   | | |",
+            "+ +-+-+ + +",
+            "| |   | | |",
+            "+ + + + + +",
+            "| |   |   |",
+            "+ + + +-+ +",
+            "|   |     |",
+            "+-+-+-+-+-+",
+    };
+
+    public MazeConfig() {
+        final int sizeX = (this.layout[0].length() - 1) / 2;
+        final int sizeY = (this.layout.length - 1) / 2;
+        this.field = createField(sizeX, sizeY);
         this.permittedDirections = MultimapBuilder.hashKeys().enumSetValues(Direction.class).<Space, Direction>build();
-        this.permittedDirections.putAll(getSpaceAt(0, 0), EnumSet.of(EAST));
-        this.permittedDirections.putAll(getSpaceAt(1, 0), EnumSet.of(EAST, WEST, SOUTH));
-        this.permittedDirections.putAll(getSpaceAt(2, 0), EnumSet.of(WEST));
-        this.permittedDirections.putAll(getSpaceAt(0, 1), EnumSet.of(SOUTH, WEST));
-        this.permittedDirections.putAll(getSpaceAt(1, 1), EnumSet.of(NORTH, EAST));
-        this.permittedDirections.putAll(getSpaceAt(2, 1), EnumSet.of(WEST, SOUTH));
-        this.permittedDirections.putAll(getSpaceAt(0, 2), EnumSet.of(NORTH, EAST));
-        this.permittedDirections.putAll(getSpaceAt(1, 2), EnumSet.of(EAST, WEST));
-        this.permittedDirections.putAll(getSpaceAt(2, 2), EnumSet.of(NORTH, WEST));
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
+                this.permittedDirections.putAll(getSpaceAt(y, x), getPermittedDirectionsAt(y, x));
+            }
+        }
+    }
+
+    private char getLayoutCharAt(final int row, final int col) {
+        final String line = this.layout[row];
+        return line.charAt(col);
+    }
+
+    private EnumSet<Direction> getPermittedDirectionsAt(final int y, final int x) {
+        final int row = y * 2 + 1;
+        final int col = x * 2 + 1;
+        if (getLayoutCharAt(row, col) != SPACE) {
+            throw new IllegalArgumentException("Invalid layout: There should be an empty space at row = " + row + " and col = " + col);
+        }
+        final EnumSet<Direction> result = EnumSet.noneOf(Direction.class);
+        if (getLayoutCharAt(row - 1, col) == SPACE) {
+            result.add(NORTH);
+        }
+        if (getLayoutCharAt(row + 1, col) == SPACE) {
+            result.add(SOUTH);
+        }
+        if (getLayoutCharAt(row, col - 1) == SPACE) {
+            result.add(WEST);
+        }
+        if (getLayoutCharAt(row, col + 1) == SPACE) {
+            result.add(EAST);
+        }
+        return result;
     }
 
     public StateMachineConfig<Space, Direction> configure(final Action1<Transition<Space, Direction>> entryAction) {
@@ -97,7 +132,7 @@ public class MazeConfig {
         for (int y = 0; y < sizeY; y++) {
             final Space[] columns = new Space[sizeX];
             for (int x = 0; x < sizeX; x++) {
-                final Space space = new Space("SPACE" + (y + 1) + (x + 1));
+                final Space space = new Space("SPACE" + y + x);
                 columns[x] = space;
             }
             rows[y] = columns;
@@ -113,7 +148,7 @@ public class MazeConfig {
         return this.field.length;
     }
 
-    public Space getSpaceAt(final int x, final int y) {
+    public Space getSpaceAt(final int y, final int x) {
         if (x == EXIT_X_COORD && y == EXIT_Y_COORD) {
             return Space.EXIT;
         }
@@ -133,7 +168,7 @@ public class MazeConfig {
     private int[] getSpaceCoordinates(final Space s) {
         for (int y = 0; y < getFieldSizeY(); y++) {
             for (int x = 0; x < getFieldSizeX(); x++) {
-                if (getSpaceAt(x, y) == s) {
+                if (getSpaceAt(y, x) == s) {
                     return new int[] {x, y};
                 }
             }
@@ -150,7 +185,7 @@ public class MazeConfig {
         case WEST: coord[0]--; break;
         }
         try {
-            return getSpaceAt(coord[0], coord[1]);
+            return getSpaceAt(coord[1], coord[0]);
         } catch (final IllegalArgumentException e) {
             throw new RuntimeException("Invalid configuration. Cannot get neighbor of " + s + " in direction of " + dir);
         }
@@ -161,7 +196,7 @@ public class MazeConfig {
     }
 
     public Space getFinalSpace() {
-        return getSpaceAt(EXIT_X_COORD, EXIT_Y_COORD);
+        return getSpaceAt(EXIT_Y_COORD, EXIT_X_COORD);
     }
 
 

@@ -33,7 +33,7 @@ public class PNGMazeRenderer implements StreamingOutput {
         for (int y = 0; y < this.cells.length; y++) {
             this.cells[y] = new Cell[maze.getConfig().getFieldSizeX()];
             for (int x = 0; x < this.cells[y].length; x++) {
-                final Space space = maze.getConfig().getSpaceAt(x, y);
+                final Space space = maze.getConfig().getSpaceAt(y, x);
                 this.cells[y][x] = new Cell(
                         maze.getConfig().getPermittedDirectionsFor(space),
                         maze.isInState(space),
