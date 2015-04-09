@@ -1,9 +1,12 @@
 package com.twilio.demo.minotaur.core;
 
-import java.util.EnumSet;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.transitions.Transition;
+import com.google.common.collect.Sets;
 import com.twilio.demo.minotaur.core.MazeConfig.Direction;
 import com.twilio.demo.minotaur.core.MazeConfig.Space;
 
@@ -11,13 +14,13 @@ public class Maze {
 
     private final MazeConfig mazeConfig;
     private final StateMachine<Space, Direction> stateMachine;
-    private final EnumSet<Space> visitedStates;
+    private final Set<Space> visitedStates;
 
     public Maze(final MazeConfig mazeConfig) {
         this.mazeConfig = mazeConfig;
         final Space initialState = mazeConfig.getInitialSpace();
         this.stateMachine = new StateMachine<>(initialState, mazeConfig.configure(this::onEntry));
-        this.visitedStates = EnumSet.of(initialState);
+        this.visitedStates = Sets.newLinkedHashSet(Collections.singleton(initialState));
     }
 
     public void onEntry(final Transition<Space, Direction> transition) {
@@ -44,7 +47,11 @@ public class Maze {
     }
 
     public String getDescription() {
-        return this.stateMachine.getState().getDescription();
+        if (this.stateMachine.getState() == this.mazeConfig.getFinalSpace()) {
+            return "Congratulations, you found your way out! Type Start to start over.";
+        } else {
+            return "";
+        }
     }
 
     public boolean move(final Direction dir) {

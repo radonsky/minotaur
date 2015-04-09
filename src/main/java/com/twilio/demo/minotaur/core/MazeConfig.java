@@ -4,15 +4,6 @@ import static com.twilio.demo.minotaur.core.MazeConfig.Direction.EAST;
 import static com.twilio.demo.minotaur.core.MazeConfig.Direction.NORTH;
 import static com.twilio.demo.minotaur.core.MazeConfig.Direction.SOUTH;
 import static com.twilio.demo.minotaur.core.MazeConfig.Direction.WEST;
-import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE11;
-import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE12;
-import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE13;
-import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE21;
-import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE22;
-import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE23;
-import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE31;
-import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE32;
-import static com.twilio.demo.minotaur.core.MazeConfig.Space.SPACE33;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -27,27 +18,20 @@ import com.google.common.collect.SetMultimap;
 
 public class MazeConfig {
 
-    public enum Space {
-        SPACE11(""),
-        SPACE12(""),
-        SPACE13(""),
-        SPACE21(""),
-        SPACE22(""),
-        SPACE23(""),
-        SPACE31(""),
-        SPACE32(""),
-        SPACE33(""),
-        EXIT("Congratulations, you found your way out! Type Start to start over.");
+    public static final class Space {
+        public static final Space EXIT = new Space("EXIT");
 
-        private final String description;
+        private final String name;
 
-        private Space(final String description) {
-            this.description = description;
+        private Space(final String name) {
+            this.name = name;
         }
 
-        public String getDescription() {
-            return this.description;
+        @Override
+        public String toString() {
+            return this.name;
         }
+
     }
 
     public enum Direction {
@@ -66,19 +50,7 @@ public class MazeConfig {
         }
     }
 
-    //        /*+--------------+--------------+-------------+*/
-    //        /*|*/ SPACE11, /* */ SPACE12, /* */ SPACE13 /*|*/,
-    //        /*+--------------+              +-------------+*/
-    //        /* */ SPACE21, /*|*/ SPACE22, /* */ SPACE23 /*|*/,
-    //        /*+              +--------------+             +*/
-    //        /*|*/ SPACE31, /* */ SPACE32, /* */ SPACE33 /*|*/,
-    //        /*+-------------------------------------------+*/
-
-    private final Space[][] field = new Space[][] {
-            new Space[] { SPACE11, SPACE12, SPACE13 },
-            new Space[] { SPACE21, SPACE22, SPACE23 },
-            new Space[] { SPACE31, SPACE32, SPACE33 }
-    };
+    private final Space[][] field = createField(3, 3);
 
     private static final int EXIT_X_COORD = -1;
     private static final int EXIT_Y_COORD = 1;
@@ -86,28 +58,51 @@ public class MazeConfig {
     private final SetMultimap<Space, Direction> permittedDirections;
 
     public MazeConfig() {
-        this.permittedDirections = MultimapBuilder.enumKeys(Space.class).enumSetValues(Direction.class).build();
-        this.permittedDirections.putAll(SPACE11, EnumSet.of(EAST));
-        this.permittedDirections.putAll(SPACE12, EnumSet.of(EAST, WEST, SOUTH));
-        this.permittedDirections.putAll(SPACE13, EnumSet.of(WEST));
-        this.permittedDirections.putAll(SPACE21, EnumSet.of(SOUTH, WEST));
-        this.permittedDirections.putAll(SPACE22, EnumSet.of(NORTH, EAST));
-        this.permittedDirections.putAll(SPACE23, EnumSet.of(WEST, SOUTH));
-        this.permittedDirections.putAll(SPACE31, EnumSet.of(NORTH, EAST));
-        this.permittedDirections.putAll(SPACE32, EnumSet.of(EAST, WEST));
-        this.permittedDirections.putAll(SPACE33, EnumSet.of(NORTH, WEST));
+        //        /*+--------------+--------------+-------------+*/
+        //        /*|*/ SPACE11, /* */ SPACE12, /* */ SPACE13 /*|*/,
+        //        /*+--------------+              +-------------+*/
+        //        /* */ SPACE21, /*|*/ SPACE22, /* */ SPACE23 /*|*/,
+        //        /*+              +--------------+             +*/
+        //        /*|*/ SPACE31, /* */ SPACE32, /* */ SPACE33 /*|*/,
+        //        /*+-------------------------------------------+*/
+
+        this.permittedDirections = MultimapBuilder.hashKeys().enumSetValues(Direction.class).<Space, Direction>build();
+        this.permittedDirections.putAll(getSpaceAt(0, 0), EnumSet.of(EAST));
+        this.permittedDirections.putAll(getSpaceAt(1, 0), EnumSet.of(EAST, WEST, SOUTH));
+        this.permittedDirections.putAll(getSpaceAt(2, 0), EnumSet.of(WEST));
+        this.permittedDirections.putAll(getSpaceAt(0, 1), EnumSet.of(SOUTH, WEST));
+        this.permittedDirections.putAll(getSpaceAt(1, 1), EnumSet.of(NORTH, EAST));
+        this.permittedDirections.putAll(getSpaceAt(2, 1), EnumSet.of(WEST, SOUTH));
+        this.permittedDirections.putAll(getSpaceAt(0, 2), EnumSet.of(NORTH, EAST));
+        this.permittedDirections.putAll(getSpaceAt(1, 2), EnumSet.of(EAST, WEST));
+        this.permittedDirections.putAll(getSpaceAt(2, 2), EnumSet.of(NORTH, WEST));
     }
 
     public StateMachineConfig<Space, Direction> configure(final Action1<Transition<Space, Direction>> entryAction) {
         final StateMachineConfig<Space, Direction> config = new StateMachineConfig<>();
-        for (final Space space : Space.values()) {
-            final StateConfiguration<Space,Direction> conf = config.configure(space);
-            for (final Direction dir : this.permittedDirections.get(space)) {
-                conf.permit(dir, getNeighbor(space, dir));
+        for (final Space[] row : this.field) {
+            for (final Space space : row) {
+                final StateConfiguration<Space,Direction> conf = config.configure(space);
+                for (final Direction dir : this.permittedDirections.get(space)) {
+                    conf.permit(dir, getNeighbor(space, dir));
+                }
+                conf.onEntry(entryAction);
             }
-            conf.onEntry(entryAction);
         }
         return config;
+    }
+
+    private Space[][] createField(final int sizeX, final int sizeY) {
+        final Space[][] rows = new Space[sizeY][];
+        for (int y = 0; y < sizeY; y++) {
+            final Space[] columns = new Space[sizeX];
+            for (int x = 0; x < sizeX; x++) {
+                final Space space = new Space("SPACE" + (y + 1) + (x + 1));
+                columns[x] = space;
+            }
+            rows[y] = columns;
+        }
+        return rows;
     }
 
     public int getFieldSizeX() {
@@ -163,6 +158,10 @@ public class MazeConfig {
 
     public Space getInitialSpace() {
         return getSpaceAt(0, 0);
+    }
+
+    public Space getFinalSpace() {
+        return getSpaceAt(EXIT_X_COORD, EXIT_Y_COORD);
     }
 
 
