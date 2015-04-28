@@ -15,6 +15,7 @@ import com.twilio.demo.minotaur.core.Game;
 import com.twilio.demo.minotaur.core.command.Command;
 import com.twilio.demo.minotaur.core.command.Response;
 import com.twilio.demo.minotaur.core.command.ShowCommand;
+import com.twilio.demo.minotaur.core.command.StartCommand;
 import com.twilio.sdk.verbs.Media;
 import com.twilio.sdk.verbs.Message;
 import com.twilio.sdk.verbs.TwiMLException;
@@ -42,6 +43,9 @@ public class SmsResource {
             final Response response = command.action(from);
             if (command instanceof ShowCommand) {
                 final String mediaUrl = uriInfo.getBaseUriBuilder().path(MediaResource.class).queryParam("From", from).build().toString();
+                return mmsReply(response.getMessage(), mediaUrl);
+            } else if (command instanceof StartCommand) {
+                final String mediaUrl = "http://upload.wikimedia.org/wikipedia/commons/e/e5/Minotaurus.gif";
                 return mmsReply(response.getMessage(), mediaUrl);
             } else {
                 return smsReply(response.getMessage());
