@@ -12,7 +12,7 @@ public class StartCommand extends AbstractCommand {
     @Override
     public Response action(final String userId) {
         final Maze maze = super.mazeRegistry.start(userId);
-        return new SimpleResponse("Welcome to the Labyrinth. Type N, S, E, W to move around this maze and find your way out. " + maze.getDirections());
+        return new SimpleResponse("Welcome to the Labyrinth. Type N, S, E, W to move around this maze and find your way out. Type SHOW to see the maze. " + maze.getDirections());
     }
 
 }
