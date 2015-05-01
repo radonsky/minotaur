@@ -38,7 +38,7 @@ public class MediaResource {
                         .entity("A maze for this user doesn't exist")
                         .build();
             }
-            final StreamingOutput stream = new PNGMazeRenderer(maze);
+            final StreamingOutput stream = new PNGMazeRenderer(maze, false, maze.isMinotaurVisible());
             return Response.ok(stream).build();
         } catch (final Exception e) {
             log.error("getPNG failed", e);

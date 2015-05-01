@@ -30,7 +30,7 @@ public class PNGMazeRenderer implements StreamingOutput {
 
     private final Cell[][] cells;
 
-    public PNGMazeRenderer(final Maze maze) {
+    public PNGMazeRenderer(final Maze maze, final boolean renderAllCells, final boolean renderMinotaur) {
         this.cells = new Cell[maze.getConfig().getFieldSizeY()][];
         for (int y = 0; y < this.cells.length; y++) {
             this.cells[y] = new Cell[maze.getConfig().getFieldSizeX()];
@@ -39,8 +39,8 @@ public class PNGMazeRenderer implements StreamingOutput {
                 this.cells[y][x] = new Cell(
                         maze.getConfig().getPermittedDirectionsFor(space),
                         maze.isInState(space),
-                        maze.isVisitedState(space),
-                        false);
+                        maze.isVisitedState(space) || renderAllCells,
+                        maze.isMinotaurInState(space) && renderMinotaur);
             }
         }
     }

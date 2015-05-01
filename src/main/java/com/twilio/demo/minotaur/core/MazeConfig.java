@@ -56,6 +56,10 @@ public class MazeConfig {
     private static final int EXIT_X_COORD = -1;
     private static final int EXIT_Y_COORD = 1;
 
+    private static final int MINOTAUR_Y_COORD = 1;
+    private static final int MINOTAUR_X_COORD = 4;
+
+
     private final SetMultimap<Space, Direction> permittedDirections;
 
     private static final char SPACE = ' ';
@@ -121,7 +125,9 @@ public class MazeConfig {
                 for (final Direction dir : this.permittedDirections.get(space)) {
                     conf.permit(dir, getNeighbor(space, dir));
                 }
-                conf.onEntry(entryAction);
+                if (entryAction != null) {
+                    conf.onEntry(entryAction);
+                }
             }
         }
         return config;
@@ -176,7 +182,7 @@ public class MazeConfig {
         return null;
     }
 
-    private Space getNeighbor(final Space s, final Direction dir) {
+    public Space getNeighbor(final Space s, final Direction dir) {
         final int[] coord = getSpaceCoordinates(s);
         switch (dir) {
         case EAST: coord[0]++; break;
@@ -197,6 +203,19 @@ public class MazeConfig {
 
     public Space getFinalSpace() {
         return getSpaceAt(EXIT_Y_COORD, EXIT_X_COORD);
+    }
+
+    public Space getMinotaurInitialSpace() {
+        return getSpaceAt(MINOTAUR_Y_COORD, MINOTAUR_X_COORD);
+    }
+
+    public boolean arePermittedNeighbors(final Space space1, final Space space2) {
+        for (final Direction dir : getPermittedDirectionsFor(space1)) {
+            if (getNeighbor(space1, dir) == space2) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

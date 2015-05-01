@@ -2,6 +2,7 @@ package com.twilio.demo.minotaur.core;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import com.github.oxo42.stateless4j.StateMachine;
@@ -15,12 +16,15 @@ public class Maze {
     private final MazeConfig mazeConfig;
     private final StateMachine<Space, Direction> stateMachine;
     private final Set<Space> visitedStates;
+    private final StateMachine<Space, Direction> minotaurMachine;
+    private final Random random = new Random();
 
     public Maze(final MazeConfig mazeConfig) {
         this.mazeConfig = mazeConfig;
         final Space initialState = mazeConfig.getInitialSpace();
         this.stateMachine = new StateMachine<>(initialState, mazeConfig.configure(this::onEntry));
         this.visitedStates = Sets.newLinkedHashSet(Collections.singleton(initialState));
+        this.minotaurMachine = new StateMachine<>(mazeConfig.getMinotaurInitialSpace(), mazeConfig.configure(null));
     }
 
     public void onEntry(final Transition<Space, Direction> transition) {
@@ -47,6 +51,9 @@ public class Maze {
     }
 
     public String getDescription() {
+        if (this.isMinotaurVisible()) {
+            return "Run! Minotaur is right next to you!";
+        }
         if (this.stateMachine.getState() == this.mazeConfig.getFinalSpace()) {
             return "Congratulations, you found your way out! Type Start to start over.";
         } else {
@@ -63,6 +70,18 @@ public class Maze {
         }
     }
 
+    public void minotaurMove() {
+        final List<Direction> dirs = this.minotaurMachine.getPermittedTriggers();
+        Space state;
+        Direction dir;
+        do {
+            final int index = this.random.nextInt(dirs.size());
+            dir = dirs.get(index);
+            state = this.mazeConfig.getNeighbor(this.minotaurMachine.getState(), dir);
+        } while (state == this.mazeConfig.getFinalSpace());
+        this.minotaurMachine.fire(dir);
+    }
+
     public boolean isInState(final Space space) {
         return this.stateMachine.isInState(space);
     }
@@ -73,6 +92,20 @@ public class Maze {
 
     public boolean isVisitedState(final Space space) {
         return this.visitedStates.contains(space);
+    }
+
+    public boolean isMinotaurInState(final Space space) {
+        return this.minotaurMachine.isInState(space);
+    }
+
+    public boolean isMinotaurVisible() {
+        final Space myState = this.stateMachine.getState();
+        final Space minotaurState = this.minotaurMachine.getState();
+        return myState == minotaurState || this.mazeConfig.arePermittedNeighbors(myState, minotaurState);
+    }
+
+    public boolean isKilledByMinotaur() {
+        return this.stateMachine.getState() == this.minotaurMachine.getState();
     }
 
 }
