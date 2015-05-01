@@ -25,4 +25,8 @@ public class UserRegistry {
         return this.phone2user.values();
     }
 
+    public String getPhone(final String user) {
+        return this.phone2user.inverse().get(user);
+    }
+
 }

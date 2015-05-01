@@ -1,19 +1,20 @@
 package com.twilio.demo.minotaur.core;
 
-import java.util.Set;
+import java.net.URI;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Status {
 
-    private final Set<String> users;
+    private final List<URI> users;
 
-    public Status(final Set<String> users) {
+    public Status(final List<URI> users) {
         this.users = users;
     }
 
     @JsonProperty
-    public Set<String> getUsers() {
+    public List<URI> getUsers() {
         return this.users;
     }
 
