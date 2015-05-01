@@ -39,8 +39,9 @@ public class PNGMazeRenderer implements StreamingOutput {
                 this.cells[y][x] = new Cell(
                         maze.getConfig().getPermittedDirectionsFor(space),
                         maze.isInState(space),
-                        maze.isVisitedState(space) || renderAllCells,
-                        maze.isMinotaurInState(space) && renderMinotaur);
+                        maze.isVisitedState(space),
+                        maze.isMinotaurInState(space) && renderMinotaur,
+                        renderAllCells);
             }
         }
     }
@@ -53,23 +54,26 @@ public class PNGMazeRenderer implements StreamingOutput {
         private static final int MINOTAUR_MAX_DIAMETER = 12;
         private static final int MINOTAUR_MIN_DIAMETER = 8;
 
-        private static final int[] WALL_COLOR = new int[] {0x00, 0x00, 0x00};
+        private static final int[] VISITED_WALL_COLOR = new int[] {0x00, 0x00, 0x00};
+        private static final int[] NOT_VISITED_WALL_COLOR = new int[] {0xC0, 0xC0, 0xC0};
         private static final int[] EMPTY_COLOR = new int[] {0xFF, 0xFF, 0xFF};
-        private static final int[] PRESENCE_COLOR = new int[] {0xC0, 0xC0, 0xC0};
+        private static final int[] PRESENCE_COLOR = new int[] {0x00, 0xFF, 0x00};
         private static final int[] MINOTAUR_COLOR = new int[] {0xFF, 0x00, 0x00};
 
         private final EnumSet<Direction> walls;
         private final boolean present;
         private final boolean visited;
         private final boolean minotaurPresent;
+        private final boolean renderAllCells;
 
         public Cell(final Set<Direction> permittedDirections, final boolean present, final boolean visited,
-                final boolean minotaurPresent) {
+                final boolean minotaurPresent, final boolean renderAllCells) {
             this.walls = EnumSet.allOf(Direction.class);
             this.walls.removeAll(permittedDirections);
             this.present = present;
             this.visited = visited;
             this.minotaurPresent = minotaurPresent;
+            this.renderAllCells = renderAllCells;
         }
 
         public int[] getColorAt(final int x, final int y) {
@@ -94,18 +98,18 @@ public class PNGMazeRenderer implements StreamingOutput {
                     return PRESENCE_COLOR;
                 }
             }
-            if (this.visited) {
+            if (this.visited || this.renderAllCells) {
                 if (x < WALL_SIZE && this.walls.contains(WEST)) {
-                    return WALL_COLOR;
+                    return this.visited ? VISITED_WALL_COLOR : NOT_VISITED_WALL_COLOR;
                 }
                 if (x > SIZE - WALL_SIZE - 1 && this.walls.contains(EAST)) {
-                    return WALL_COLOR;
+                    return this.visited ? VISITED_WALL_COLOR : NOT_VISITED_WALL_COLOR;
                 }
                 if (y < WALL_SIZE && this.walls.contains(NORTH)) {
-                    return WALL_COLOR;
+                    return this.visited ? VISITED_WALL_COLOR : NOT_VISITED_WALL_COLOR;
                 }
                 if (y > SIZE - WALL_SIZE - 1 && this.walls.contains(SOUTH)) {
-                    return WALL_COLOR;
+                    return this.visited ? VISITED_WALL_COLOR : NOT_VISITED_WALL_COLOR;
                 }
             }
             return EMPTY_COLOR;
