@@ -10,7 +10,7 @@ public class ShowCommand implements Command {
 
     @Override
     public Response action(final String userId) {
-        final URI uri = UriBuilder.fromResource(MediaResource.class).path(MediaResource.class).queryParam("From", userId).build();
+        final URI uri = UriBuilder.fromResource(MediaResource.class).queryParam("From", userId).build();
         return new MultimediaResponse("Here is an image of the maze.", uri);
     }
 
