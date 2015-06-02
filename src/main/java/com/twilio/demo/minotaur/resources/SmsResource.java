@@ -1,5 +1,7 @@
 package com.twilio.demo.minotaur.resources;
 
+import java.net.URI;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -13,9 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import com.twilio.demo.minotaur.core.Game;
 import com.twilio.demo.minotaur.core.command.Command;
+import com.twilio.demo.minotaur.core.command.MultimediaResponse;
 import com.twilio.demo.minotaur.core.command.Response;
-import com.twilio.demo.minotaur.core.command.ShowCommand;
-import com.twilio.demo.minotaur.core.command.StartCommand;
 import com.twilio.sdk.verbs.Media;
 import com.twilio.sdk.verbs.Message;
 import com.twilio.sdk.verbs.TwiMLException;
@@ -41,12 +42,10 @@ public class SmsResource {
         try {
             final Command command = this.game.parseCommand(from, body);
             final Response response = command.action(from);
-            if (command instanceof ShowCommand) {
-                final String mediaUrl = uriInfo.getBaseUriBuilder().path(MediaResource.class).queryParam("From", from).build().toString();
-                return mmsReply(response.getMessage(), mediaUrl);
-            } else if (command instanceof StartCommand) {
-                final String mediaUrl = "http://upload.wikimedia.org/wikipedia/commons/e/e5/Minotaurus.gif";
-                return mmsReply(response.getMessage(), mediaUrl);
+            if (response instanceof MultimediaResponse) {
+                final URI uri = ((MultimediaResponse) response).getMediaUri();
+                final String url = uriInfo.getBaseUriBuilder().uri(uri).build().toString();
+                return mmsReply(response.getMessage(), url);
             } else {
                 return smsReply(response.getMessage());
             }

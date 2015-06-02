@@ -50,17 +50,6 @@ public class Maze {
         return bldr.toString();
     }
 
-    public String getDescription() {
-        if (this.isMinotaurVisible()) {
-            return "Run! Minotaur is right next to you!";
-        }
-        if (this.stateMachine.getState() == this.mazeConfig.getFinalSpace()) {
-            return "Congratulations, you found your way out! Type Start to start over.";
-        } else {
-            return "";
-        }
-    }
-
     public boolean move(final Direction dir) {
         if (this.stateMachine.canFire(dir)) {
             this.stateMachine.fire(dir);
