@@ -20,11 +20,21 @@ public class Game {
         this.userRegistry = userRegistry;
         this.mazeRegistry = mazeRegistry;
         this.commands.put("START", new StartCommand(this.mazeRegistry, this.userRegistry));
-        this.commands.put("W", new MoveCommand(this.mazeRegistry, Direction.WEST));
-        this.commands.put("S", new MoveCommand(this.mazeRegistry, Direction.SOUTH));
-        this.commands.put("N", new MoveCommand(this.mazeRegistry, Direction.NORTH));
-        this.commands.put("E", new MoveCommand(this.mazeRegistry, Direction.EAST));
-        this.commands.put("SHOW", new ShowCommand(this.mazeRegistry));
+        final MoveCommand moveWest = new MoveCommand(this.mazeRegistry, Direction.WEST);
+        this.commands.put("W", moveWest);
+        this.commands.put("WEST", moveWest);
+        final MoveCommand moveSouth = new MoveCommand(this.mazeRegistry, Direction.SOUTH);
+        this.commands.put("S", moveSouth);
+        this.commands.put("SOUTH", moveSouth);
+        final MoveCommand moveNorth = new MoveCommand(this.mazeRegistry, Direction.NORTH);
+        this.commands.put("N", moveNorth);
+        this.commands.put("NORTH", moveNorth);
+        final MoveCommand moveEast = new MoveCommand(this.mazeRegistry, Direction.EAST);
+        this.commands.put("E", moveEast);
+        this.commands.put("EAST", moveEast);
+        final ShowCommand show = new ShowCommand(this.mazeRegistry);
+        this.commands.put("SHOW", show);
+        this.commands.put("MAP", show);
         this.commands.put("?", new HelpCommand(this.mazeRegistry));
     }
 
