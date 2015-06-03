@@ -23,7 +23,7 @@ public class MoveCommand extends AbstractCommand {
     public Response action(final String userId) {
         final Maze maze = super.mazeRegistry.get(userId);
         if (maze.isKilledByMinotaur()) {
-            return new MultimediaResponse("You have been killed by Minotaur! Type Start to start over.", KILLED_URI);
+            return new SimpleResponse("You have been killed by Minotaur! Type Start to start over.");
         }
         final boolean valid = maze.move(this.direction);
         if (maze.isKilledByMinotaur()) {
