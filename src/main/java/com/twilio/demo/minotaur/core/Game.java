@@ -25,7 +25,7 @@ public class Game {
         this.commands.put("N", new MoveCommand(this.mazeRegistry, Direction.NORTH));
         this.commands.put("E", new MoveCommand(this.mazeRegistry, Direction.EAST));
         this.commands.put("SHOW", new ShowCommand(this.mazeRegistry));
-        this.commands.put("HELP", new HelpCommand(this.mazeRegistry));
+        this.commands.put("?", new HelpCommand(this.mazeRegistry));
     }
 
     public Command parseCommand(final String userId, final String body) {
