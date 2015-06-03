@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import com.twilio.demo.minotaur.core.MazeConfig.Direction;
 import com.twilio.demo.minotaur.core.command.Command;
+import com.twilio.demo.minotaur.core.command.HelpCommand;
 import com.twilio.demo.minotaur.core.command.InvalidCommand;
 import com.twilio.demo.minotaur.core.command.MoveCommand;
 import com.twilio.demo.minotaur.core.command.ShowCommand;
@@ -23,7 +24,8 @@ public class Game {
         this.commands.put("S", new MoveCommand(this.mazeRegistry, Direction.SOUTH));
         this.commands.put("N", new MoveCommand(this.mazeRegistry, Direction.NORTH));
         this.commands.put("E", new MoveCommand(this.mazeRegistry, Direction.EAST));
-        this.commands.put("SHOW", new ShowCommand());
+        this.commands.put("SHOW", new ShowCommand(this.mazeRegistry));
+        this.commands.put("HELP", new HelpCommand(this.mazeRegistry));
     }
 
     public Command parseCommand(final String userId, final String body) {
