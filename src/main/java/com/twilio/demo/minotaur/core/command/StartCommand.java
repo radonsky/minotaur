@@ -21,7 +21,7 @@ public class StartCommand extends AbstractCommand {
     public Response action(final String userId) {
         final Maze maze = super.mazeRegistry.start(userId);
         final String user = this.userRegistry.getUser(userId);
-        return new MultimediaResponse("Welcome to the Labyrinth, " + user + ". "
+        return new MultimediaResponse("Welcome to the Labyrinth, " + user + "! "
                 + "Type N, S, E, W to move around and find your way out. "
                 + "Type SHOW to see the maze, ? for help. Beware of the Minotaur! " + maze.getDirections(),
                 WELCOME_URI
