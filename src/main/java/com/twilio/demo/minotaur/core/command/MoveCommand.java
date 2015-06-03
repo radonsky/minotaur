@@ -39,7 +39,7 @@ public class MoveCommand extends AbstractCommand {
             if (maze.isInState(maze.getConfig().getFinalSpace())) {
                 return new MultimediaResponse("Congratulations, you found your way out! Type Start to start over.", FINAL_URI);
             } else {
-                return new SimpleResponse(maze.getDirections());
+                return new SimpleResponse("You went " + this.direction + ". " + maze.getDirections());
             }
         }
     }
