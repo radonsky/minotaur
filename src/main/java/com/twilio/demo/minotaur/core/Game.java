@@ -19,7 +19,7 @@ public class Game {
     public Game(final UserRegistry userRegistry, final MazeRegistry mazeRegistry) {
         this.userRegistry = userRegistry;
         this.mazeRegistry = mazeRegistry;
-        this.commands.put("START", new StartCommand(this.mazeRegistry));
+        this.commands.put("START", new StartCommand(this.mazeRegistry, this.userRegistry));
         this.commands.put("W", new MoveCommand(this.mazeRegistry, Direction.WEST));
         this.commands.put("S", new MoveCommand(this.mazeRegistry, Direction.SOUTH));
         this.commands.put("N", new MoveCommand(this.mazeRegistry, Direction.NORTH));
